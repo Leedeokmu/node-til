@@ -15,6 +15,7 @@ const tourSchema = new mongoose.Schema(
       minlength: [10, 'A tour name must have more or equal than 10 characters'],
       // validate: [validator.isAlpha, 'Tour name must only contain characters'],
     },
+    slug: String,
     duration: {
       type: Number,
       require: [true, 'A tour must have a duration'],
@@ -111,7 +112,7 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
-tourSchema.index({ price: 1 });
+tourSchema.index({ slug: 1 });
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ startLocation: '2dsphere' });
 
@@ -147,7 +148,7 @@ tourSchema.pre('save', function (next) {
 // tourSchema.pre('find', function(next) {
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
-  this.start = Date.now();
+  // this.start = Date.now();
   this.populate({
     path: 'guides',
     select: '-__v -passwordChangedAt',
@@ -155,10 +156,10 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-tourSchema.post(/^find/, function (docs, next) {
-  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
-  next();
-});
+// tourSchema.post(/^find/, function (docs, next) {
+//   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+//   next();
+// });
 
 // AGGREGATION MIDDLEWARE
 // tourSchema.pre('aggregate', function (next) {
